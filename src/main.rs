@@ -36,4 +36,29 @@ fn run_prompt() -> io::Result<()> {
     Ok(())
 }
 
-fn run(_source: &str) {}
+struct Scanner<'a> {
+    #[allow(unused)]
+    source: &'a str,
+}
+
+impl<'a> Scanner<'a> {
+    fn new(source: &'a str) -> Self {
+        Self { source }
+    }
+
+    fn scan_tokens(self) -> Vec<Token> {
+        vec![]
+    }
+}
+
+#[derive(Debug)]
+struct Token;
+
+fn run(source: &str) {
+    let scanner = Scanner::new(source);
+    let tokens = scanner.scan_tokens();
+
+    for token in tokens {
+        println!("{:?}", token);
+    }
+}
