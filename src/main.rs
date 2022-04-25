@@ -1,4 +1,4 @@
-use std::io::{self, BufRead};
+use std::io::{self, Write};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -22,18 +22,17 @@ fn run_file(file_path: &str) -> io::Result<()> {
 
 fn run_prompt() -> io::Result<()> {
     let stdin = io::stdin();
-    let mut reader = stdin.lock().lines();
 
     loop {
         print!("> ");
+        io::stdout().flush()?;
 
-        match reader.next() {
-            Some(line) => run(&line?),
-            None => break,
-        };
+        let mut line = String::new();
+
+        let _ = stdin.read_line(&mut line)?;
+
+        print!("{line}");
     }
-
-    Ok(())
 }
 
 struct Scanner<'a> {
