@@ -1,13 +1,13 @@
 use std::io::{self, BufRead};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut args = std::env::args();
+    let args: Vec<String> = std::env::args().skip(1).collect();
 
     if args.len() > 1 {
         println!("Usage: rlox [script]");
         std::process::exit(64);
     } else if args.len() == 1 {
-        run_file(&args.next().unwrap())?;
+        run_file(&args[0])?;
     } else {
         run_prompt()?;
     }
