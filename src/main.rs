@@ -28,10 +28,10 @@ fn run_prompt() -> io::Result<()> {
         io::stdout().flush()?;
 
         let mut line = String::new();
-
         let _ = stdin.read_line(&mut line)?;
 
         print!("{line}");
+        run(&line);
     }
 }
 
