@@ -1,4 +1,5 @@
 use std::io::{self, Write};
+use lox0::token::Token;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -52,15 +53,12 @@ impl<'a> Scanner<'a> {
     }
 }
 
-#[derive(Debug)]
-struct Token;
-
 fn run(source: &str) {
     let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
 
     for token in tokens {
-        println!("{:?}", token);
+        println!("{}", token);
     }
 }
 
