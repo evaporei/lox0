@@ -1,5 +1,5 @@
+use lox0::scanner::Scanner;
 use std::io::{self, Write};
-use lox0::token::Token;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -35,21 +35,6 @@ fn run_prompt() -> io::Result<()> {
         print!("{line}");
         run(&line);
         // had_error = false;
-    }
-}
-
-struct Scanner<'a> {
-    #[allow(unused)]
-    source: &'a str,
-}
-
-impl<'a> Scanner<'a> {
-    fn new(source: &'a str) -> Self {
-        Self { source }
-    }
-
-    fn scan_tokens(self) -> Vec<Token> {
-        vec![]
     }
 }
 
