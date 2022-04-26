@@ -22,6 +22,7 @@ fn run_file(file_path: &str) -> io::Result<()> {
 
 fn run_prompt() -> io::Result<()> {
     let stdin = io::stdin();
+    // let mut had_error = false;
 
     loop {
         print!("> ");
@@ -32,6 +33,7 @@ fn run_prompt() -> io::Result<()> {
 
         print!("{line}");
         run(&line);
+        // had_error = false;
     }
 }
 
@@ -60,4 +62,13 @@ fn run(source: &str) {
     for token in tokens {
         println!("{:?}", token);
     }
+}
+
+fn error(line: usize, message: &str) {
+    report(line, "", message);
+}
+
+fn report(line: usize, where_: &str, message: &str) {
+    eprintln!("[line {line}] Error {where_}: {message}");
+    // had_error = true;
 }
