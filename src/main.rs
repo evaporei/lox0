@@ -39,19 +39,10 @@ fn run_prompt() -> io::Result<()> {
 }
 
 fn run(source: &str) {
-    let scanner = Scanner::new(source);
+    let mut scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
 
     for token in tokens {
         println!("{}", token);
     }
-}
-
-fn error(line: usize, message: &str) {
-    report(line, "", message);
-}
-
-fn report(line: usize, where_: &str, message: &str) {
-    eprintln!("[line {line}] Error {where_}: {message}");
-    // had_error = true;
 }
