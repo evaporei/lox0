@@ -38,19 +38,81 @@ impl<'a> Scanner<'a> {
     }
 
     fn scan_token(&mut self) {
-        match self.advance() {
-            '(' => self.add_token(TokenType::LeftParen, Box::new(())),
-            ')' => self.add_token(TokenType::RightParen, Box::new(())),
-            '{' => self.add_token(TokenType::LeftBrace, Box::new(())),
-            '}' => self.add_token(TokenType::RightBrace, Box::new(())),
-            ',' => self.add_token(TokenType::Comma, Box::new(())),
-            '.' => self.add_token(TokenType::Dot, Box::new(())),
-            '-' => self.add_token(TokenType::Minus, Box::new(())),
-            '+' => self.add_token(TokenType::Plus, Box::new(())),
-            ';' => self.add_token(TokenType::Semicolon, Box::new(())),
-            '*' => self.add_token(TokenType::Star, Box::new(())),
+        let ty = match self.advance() {
+            '(' => TokenType::LeftParen,
+            ')' => TokenType::RightParen,
+            '{' => TokenType::LeftBrace,
+            '}' => TokenType::RightBrace,
+            ',' => TokenType::Comma,
+            '.' => TokenType::Dot,
+            '-' => TokenType::Minus,
+            '+' => TokenType::Plus,
+            ';' => TokenType::Semicolon,
+            '*' => TokenType::Star,
+            '!' => {
+                if self.match_('=') {
+                    TokenType::BangEqual
+                } else {
+                    TokenType::Bang
+                }
+            }
+            '=' => {
+                if self.match_('=') {
+                    TokenType::EqualEqual
+                } else {
+                    TokenType::Equal
+                }
+            }
+            '<' => {
+                if self.match_('=') {
+                    TokenType::LessEqual
+                } else {
+                    TokenType::Less
+                }
+            }
+            '>' => {
+                if self.match_('=') {
+                    TokenType::GreaterEqual
+                } else {
+                    TokenType::Greater
+                }
+            }
+            '/' => {
+                if self.match_('/') {
+                    while self.peek() != '\n' && !self.is_at_end() {
+                        self.advance();
+                    }
+                    return;
+                } else {
+                    TokenType::Slash
+                }
+            }
             _ => error(self.line, "Unexpected character."),
+        };
+
+        self.add_token(ty, Box::new(()));
+    }
+
+    fn peek(&self) -> char {
+        if self.is_at_end() {
+            '\0'
+        } else {
+            self.source.chars().next().unwrap()
         }
+    }
+
+    fn match_(&mut self, expected: char) -> bool {
+        if self.is_at_end() {
+            return false;
+        }
+
+        if self.source.chars().next().unwrap() != expected {
+            return false;
+        }
+
+        self.current += 1;
+
+        true
     }
 
     fn is_at_end(&self) -> bool {
