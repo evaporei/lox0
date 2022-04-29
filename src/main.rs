@@ -30,7 +30,12 @@ fn run_prompt() -> io::Result<()> {
         io::stdout().flush()?;
 
         let mut line = String::new();
-        let _ = stdin.read_line(&mut line)?;
+        let bytes = stdin.read_line(&mut line)?;
+
+        // EOF
+        if bytes == 0 {
+            break Ok(());
+        }
 
         print!("{line}");
         run(&line);
