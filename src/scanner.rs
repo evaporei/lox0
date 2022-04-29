@@ -79,6 +79,7 @@ impl<'a> Scanner<'a> {
             }
             '/' => {
                 if self.match_('/') {
+                    // A comment goes until the end of the line.
                     while self.peek() != '\n' && !self.is_at_end() {
                         self.advance();
                     }
@@ -86,6 +87,14 @@ impl<'a> Scanner<'a> {
                 } else {
                     TokenType::Slash
                 }
+            }
+            // Ignore whitespace
+            ' ' | '\r' | '\t' => {
+                return;
+            }
+            '\n' => {
+                self.line += 1;
+                return;
             }
             _ => error(self.line, "Unexpected character."),
         };
