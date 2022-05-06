@@ -96,10 +96,29 @@ impl<'a> Scanner<'a> {
                 self.line += 1;
                 return;
             }
+            '"' => TokenType::String(self.string()),
             _ => error(self.line, "Unexpected character."),
         };
 
         self.add_token(ty, Box::new(()));
+    }
+
+    fn string(&mut self) -> String {
+        while self.peek() != '"' && !self.is_at_end() {
+            if self.peek() == '\n' {
+                self.line += 1;
+            }
+
+            self.advance();
+        }
+
+        if self.is_at_end() {
+            error(self.line, "Unterminated string.");
+        }
+
+        self.advance();
+
+        (&self.source[self.start + 1..self.current - 1]).into()
     }
 
     fn peek(&self) -> char {

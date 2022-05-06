@@ -27,7 +27,7 @@ pub enum TokenType {
 
     // Literals.
     Identifier,
-    String,
+    String(String),
     Number,
 
     // Keywords.
@@ -76,7 +76,9 @@ impl fmt::Display for TokenType {
             Self::LessEqual => "<=",
 
             // Literals.
-            Self::Identifier | Self::String | Self::Number => "tbd",
+            Self::Identifier => "tbd",
+            Self::String(s) => s,
+            Self::Number => "tbd",
 
             // Keywords.
             Self::And => "and",
