@@ -10,6 +10,8 @@ pub struct Scanner<'a> {
     line: usize,
 }
 
+use std::collections::HashMap;
+
 impl<'a> Scanner<'a> {
     pub fn new(source: &'a str) -> Self {
         Self {
@@ -19,6 +21,26 @@ impl<'a> Scanner<'a> {
             current: 0,
             line: 1,
         }
+    }
+
+    // FIXME: make const (I don't want to use lazy_static ;-;)
+    fn keywords(&self) -> HashMap<&'a str, TokenType> {
+        let mut k = HashMap::new();
+        k.insert("and", TokenType::And);
+        k.insert("or", TokenType::Or);
+        k.insert("true", TokenType::True);
+        k.insert("false", TokenType::False);
+        k.insert("class", TokenType::Class);
+        k.insert("super", TokenType::Super);
+        k.insert("this", TokenType::This);
+        k.insert("var", TokenType::Var);
+        k.insert("return", TokenType::Return);
+        k.insert("if", TokenType::If);
+        k.insert("else", TokenType::Else);
+        k.insert("while", TokenType::While);
+        k.insert("for", TokenType::For);
+        k.insert("print", TokenType::Print);
+        k
     }
 
     pub fn scan_tokens(&mut self) -> &Vec<Token> {
@@ -98,10 +120,10 @@ impl<'a> Scanner<'a> {
             }
             '"' => TokenType::String(self.string()),
             c => {
-                if c == 'o' && self.match_('r') {
-                    TokenType::Or
-                } else if self.is_digit(c) {
+                if self.is_digit(c) {
                     TokenType::Number(self.number())
+                } else if self.is_alpha(c) {
+                    self.identifier()
                 } else {
                     self.error("Unexpected character.")
                 }
@@ -109,6 +131,27 @@ impl<'a> Scanner<'a> {
         };
 
         self.add_token(ty, Box::new(()));
+    }
+
+    fn identifier(&mut self) -> TokenType {
+        while self.is_alpha_numeric(self.peek()) {
+            self.advance();
+        }
+
+        let text = &self.source[self.start..self.current];
+
+        match self.keywords().get(text) {
+            Some(ty) => ty.clone(),
+            None => TokenType::Identifier,
+        }
+    }
+
+    fn is_alpha_numeric(&self, c: char) -> bool {
+        self.is_alpha(c) || self.is_digit(c)
+    }
+
+    fn is_alpha(&self, c: char) -> bool {
+        (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
     }
 
     fn is_digit(&self, c: char) -> bool {

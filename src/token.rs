@@ -1,6 +1,7 @@
 use std::any::Any;
 use std::fmt;
 
+#[derive(Clone)]
 pub enum TokenType {
     // Single-character tokens.
     LeftParen,
