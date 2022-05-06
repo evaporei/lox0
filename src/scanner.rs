@@ -98,7 +98,9 @@ impl<'a> Scanner<'a> {
             }
             '"' => TokenType::String(self.string()),
             c => {
-                if self.is_digit(c) {
+                if c == 'o' && self.match_('r') {
+                    TokenType::Or
+                } else if self.is_digit(c) {
                     TokenType::Number(self.number())
                 } else {
                     self.error("Unexpected character.")
