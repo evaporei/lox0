@@ -97,10 +97,45 @@ impl<'a> Scanner<'a> {
                 return;
             }
             '"' => TokenType::String(self.string()),
-            _ => self.error("Unexpected character."),
+            c => {
+                if self.is_digit(c) {
+                    TokenType::Number(self.number())
+                } else {
+                    self.error("Unexpected character.")
+                }
+            }
         };
 
         self.add_token(ty, Box::new(()));
+    }
+
+    fn is_digit(&self, c: char) -> bool {
+        c >= '0' && c <= '9'
+    }
+
+    fn number(&mut self) -> f64 {
+        while self.is_digit(self.peek()) {
+            self.advance();
+        }
+
+        if self.peek() == '.' && self.is_digit(self.peek_next()) {
+            // Consume the "."
+            self.advance();
+
+            while self.is_digit(self.peek()) {
+                self.advance();
+            }
+        }
+
+        self.source[self.start..self.current].parse().unwrap()
+    }
+
+    fn peek_next(&self) -> char {
+        if self.current + 1 >= self.source.len() {
+            '\0'
+        } else {
+            self.source.chars().nth(self.current + 1).unwrap()
+        }
     }
 
     fn string(&mut self) -> String {

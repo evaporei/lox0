@@ -28,7 +28,7 @@ pub enum TokenType {
     // Literals.
     Identifier,
     String(String),
-    Number,
+    Number(f64),
 
     // Keywords.
     And,
@@ -78,7 +78,12 @@ impl fmt::Display for TokenType {
             // Literals.
             Self::Identifier => "tbd",
             Self::String(s) => s,
-            Self::Number => "tbd",
+            Self::Number(n) => {
+                write!(f, "{}", n.to_string())?;
+                // FIXME: workaround to avoid let binding of n.to_string()
+                // "temporary value..."
+                ""
+            }
 
             // Keywords.
             Self::And => "and",
