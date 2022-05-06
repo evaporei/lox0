@@ -1,4 +1,4 @@
-use crate::error::error;
+use crate::error;
 use crate::token::{Token, TokenType};
 use std::any::Any;
 
@@ -97,7 +97,7 @@ impl<'a> Scanner<'a> {
                 return;
             }
             '"' => TokenType::String(self.string()),
-            _ => error(self.line, "Unexpected character."),
+            _ => self.error("Unexpected character."),
         };
 
         self.add_token(ty, Box::new(()));
@@ -113,7 +113,7 @@ impl<'a> Scanner<'a> {
         }
 
         if self.is_at_end() {
-            error(self.line, "Unterminated string.");
+            self.error("Unterminated string.");
         }
 
         self.advance();
@@ -156,5 +156,9 @@ impl<'a> Scanner<'a> {
         let text = &self.source[self.start..self.current];
         self.tokens
             .push(Token::new(ty, text.into(), literal, self.line));
+    }
+
+    fn error(&self, msg: &str) -> ! {
+        error::error(self.line, msg)
     }
 }
