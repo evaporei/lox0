@@ -2,6 +2,24 @@ use crate::error;
 use crate::token::{Token, TokenType};
 use std::any::Any;
 
+const KEYWORDS: &[(&str, TokenType)] = &[
+    ("and", TokenType::And),
+    ("or", TokenType::Or),
+    ("true", TokenType::True),
+    ("false", TokenType::False),
+    ("class", TokenType::Class),
+    ("super", TokenType::Super),
+    ("this", TokenType::This),
+    ("var", TokenType::Var),
+    ("return", TokenType::Return),
+    ("if", TokenType::If),
+    ("else", TokenType::Else),
+    ("this", TokenType::This),
+    ("while", TokenType::While),
+    ("for", TokenType::For),
+    ("print", TokenType::Print),
+];
+
 pub struct Scanner<'a> {
     source: &'a str,
     tokens: Vec<Token>,
@@ -9,8 +27,6 @@ pub struct Scanner<'a> {
     current: usize,
     line: usize,
 }
-
-use std::collections::HashMap;
 
 impl<'a> Scanner<'a> {
     pub fn new(source: &'a str) -> Self {
@@ -21,26 +37,6 @@ impl<'a> Scanner<'a> {
             current: 0,
             line: 1,
         }
-    }
-
-    // FIXME: make const (I don't want to use lazy_static ;-;)
-    fn keywords(&self) -> HashMap<&'a str, TokenType> {
-        let mut k = HashMap::new();
-        k.insert("and", TokenType::And);
-        k.insert("or", TokenType::Or);
-        k.insert("true", TokenType::True);
-        k.insert("false", TokenType::False);
-        k.insert("class", TokenType::Class);
-        k.insert("super", TokenType::Super);
-        k.insert("this", TokenType::This);
-        k.insert("var", TokenType::Var);
-        k.insert("return", TokenType::Return);
-        k.insert("if", TokenType::If);
-        k.insert("else", TokenType::Else);
-        k.insert("while", TokenType::While);
-        k.insert("for", TokenType::For);
-        k.insert("print", TokenType::Print);
-        k
     }
 
     pub fn scan_tokens(&mut self) -> &Vec<Token> {
@@ -140,8 +136,8 @@ impl<'a> Scanner<'a> {
 
         let text = &self.source[self.start..self.current];
 
-        match self.keywords().get(text) {
-            Some(ty) => ty.clone(),
+        match KEYWORDS.iter().find(|(k, _)| k == &text) {
+            Some((_, ty)) => ty.clone(),
             None => TokenType::Identifier,
         }
     }
