@@ -127,7 +127,6 @@ impl Token {
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        // write!(f, "{} {} {}", self.ty, self.lexeme, self.literal)
-        write!(f, "{} {} any", self.ty, self.lexeme)
+        write!(f, "{} {}", self.ty, self.lexeme)
     }
 }
