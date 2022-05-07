@@ -2,60 +2,72 @@
 
 use crate::token::Token;
 
-trait Expr {}
+pub trait Expr: std::fmt::Display {}
 
-type BoxedExpr = Box<dyn Expr>;
+type BoxExpr = Box<dyn Expr>;
 
-struct Binary {
-    left: BoxedExpr,
-    operator: Token,
-    right: BoxedExpr,
+pub struct Binary {
+    pub lhs: BoxExpr,
+    pub op: Token,
+    pub rhs: BoxExpr,
 }
 
 impl Binary {
-    fn new(left: BoxedExpr, operator: Token, right: BoxedExpr) -> Self {
-        Self {
-            left,
-            operator,
-            right,
-        }
+    pub fn new(lhs: BoxExpr, op: Token, rhs: BoxExpr) -> Self {
+        Self { lhs, op, rhs }
+    }
+
+    pub fn boxed(lhs: BoxExpr, op: Token, rhs: BoxExpr) -> Box<Self> {
+        Box::new(Self::new(lhs, op, rhs))
     }
 }
 
 impl Expr for Binary {}
 
-struct Grouping {
-    expression: BoxedExpr,
+pub struct Grouping {
+    pub expr: BoxExpr,
 }
 
 impl Grouping {
-    fn new(expression: BoxedExpr) -> Self {
-        Self { expression }
+    pub fn new(expr: BoxExpr) -> Self {
+        Self { expr }
+    }
+
+    pub fn boxed(expr: BoxExpr) -> Box<Self> {
+        Box::new(Self::new(expr))
     }
 }
 
 impl Expr for Grouping {}
 
-struct Literal {
-    value: BoxedExpr,
+pub struct Literal {
+    pub expr: Token,
 }
 
 impl Literal {
-    fn new(value: BoxedExpr) -> Self {
-        Self { value }
+    pub fn new(expr: Token) -> Self {
+        Self { expr }
+    }
+
+    pub fn boxed(expr: Token) -> Box<Self> {
+        Box::new(Self::new(expr))
     }
 }
 
 impl Expr for Literal {}
 
-struct Unary {
-    operator: Token,
-    right: BoxedExpr,
+pub struct Unary {
+    pub op: Token,
+    pub rhs: BoxExpr,
 }
 
 impl Unary {
-    fn new(operator: Token, right: BoxedExpr) -> Self {
-        Self { operator, right }
+    pub fn new(op: Token, rhs: BoxExpr) -> Self {
+        Self { op, rhs }
+    }
+
+    pub fn boxed(op: Token, rhs: BoxExpr) -> Box<Self> {
+        Box::new(Self::new(op, rhs))
     }
 }
 
