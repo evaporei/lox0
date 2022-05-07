@@ -1,6 +1,6 @@
 use std::fmt;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum TokenType {
     // Single-character tokens.
     LeftParen,
@@ -108,6 +108,7 @@ impl fmt::Display for TokenType {
     }
 }
 
+#[derive(Debug)]
 pub struct Token {
     ty: TokenType,
     lexeme: String,
