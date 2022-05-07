@@ -111,6 +111,7 @@ impl fmt::Display for TokenType {
 pub struct Token {
     ty: TokenType,
     lexeme: String,
+    #[allow(dead_code)]
     line: usize,
 }
 
