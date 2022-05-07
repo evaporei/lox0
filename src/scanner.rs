@@ -1,6 +1,5 @@
 use crate::error;
 use crate::token::{Token, TokenType};
-use std::any::Any;
 
 const KEYWORDS: &[(&str, TokenType)] = &[
     ("and", TokenType::And),
@@ -48,7 +47,6 @@ impl<'a> Scanner<'a> {
         self.tokens.push(Token::new(
             TokenType::EOF,
             "".into(),
-            Box::new(()),
             self.line,
         ));
 
@@ -126,7 +124,7 @@ impl<'a> Scanner<'a> {
             }
         };
 
-        self.add_token(ty, Box::new(()));
+        self.add_token(ty);
     }
 
     fn identifier(&mut self) -> TokenType {
@@ -228,10 +226,10 @@ impl<'a> Scanner<'a> {
         self.source.chars().next().unwrap()
     }
 
-    fn add_token(&mut self, ty: TokenType, literal: Box<dyn Any>) {
+    fn add_token(&mut self, ty: TokenType) {
         let text = &self.source[self.start..self.current];
         self.tokens
-            .push(Token::new(ty, text.into(), literal, self.line));
+            .push(Token::new(ty, text.into(), self.line));
     }
 
     fn error(&self, msg: &str) -> ! {

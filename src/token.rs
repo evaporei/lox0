@@ -1,4 +1,3 @@
-use std::any::Any;
 use std::fmt;
 
 #[derive(Clone)]
@@ -112,16 +111,14 @@ impl fmt::Display for TokenType {
 pub struct Token {
     ty: TokenType,
     lexeme: String,
-    literal: Box<dyn Any>,
     line: usize,
 }
 
 impl Token {
-    pub fn new(ty: TokenType, lexeme: String, literal: Box<dyn Any>, line: usize) -> Self {
+    pub fn new(ty: TokenType, lexeme: String, line: usize) -> Self {
         Self {
             ty,
             lexeme,
-            literal,
             line,
         }
     }
