@@ -118,11 +118,7 @@ pub struct Token {
 
 impl Token {
     pub fn new(ty: TokenType, lexeme: String, line: usize) -> Self {
-        Self {
-            ty,
-            lexeme,
-            line,
-        }
+        Self { ty, lexeme, line }
     }
 }
 
