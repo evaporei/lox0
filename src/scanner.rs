@@ -39,7 +39,7 @@ impl<'a> Scanner<'a> {
     }
 
     pub fn scan_tokens(&mut self) -> &Vec<Token> {
-        while self.is_at_end() {
+        while !self.is_at_end() {
             self.start = self.current;
             self.scan_token();
         }
@@ -196,7 +196,7 @@ impl<'a> Scanner<'a> {
         if self.is_at_end() {
             '\0'
         } else {
-            self.source.chars().next().unwrap()
+            self.source.chars().nth(self.current).unwrap()
         }
     }
 
@@ -205,7 +205,7 @@ impl<'a> Scanner<'a> {
             return false;
         }
 
-        if self.source.chars().next().unwrap() != expected {
+        if self.source.chars().nth(self.current).unwrap() != expected {
             return false;
         }
 
@@ -219,8 +219,9 @@ impl<'a> Scanner<'a> {
     }
 
     fn advance(&mut self) -> char {
+        let c = self.source.chars().nth(self.current).unwrap();
         self.current += 1;
-        self.source.chars().next().unwrap()
+        c
     }
 
     fn add_token(&mut self, ty: TokenType) {
