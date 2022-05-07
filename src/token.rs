@@ -26,7 +26,7 @@ pub enum TokenType {
     LessEqual,
 
     // Literals.
-    Identifier,
+    Identifier(String),
     String(String),
     Number(f64),
 
@@ -76,7 +76,7 @@ impl fmt::Display for TokenType {
             Self::LessEqual => "<=",
 
             // Literals.
-            Self::Identifier => "tbd",
+            Self::Identifier(s) => s,
             Self::String(s) => s,
             Self::Number(n) => {
                 write!(f, "{}", n.to_string())?;
@@ -101,7 +101,7 @@ impl fmt::Display for TokenType {
             Self::For => "for",
             Self::Print => "print",
 
-            Self::EOF => "tbd",
+            Self::EOF => "EOF",
         };
 
         write!(f, "{t}")

@@ -136,7 +136,7 @@ impl<'a> Scanner<'a> {
 
         match KEYWORDS.iter().find(|(k, _)| k == &text) {
             Some((_, ty)) => ty.clone(),
-            None => TokenType::Identifier,
+            None => TokenType::Identifier(text.to_string()),
         }
     }
 
