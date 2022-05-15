@@ -32,6 +32,7 @@ impl fmt::Display for TokenType {
             Self::Identifier(s) => write!(f, "{}", s),
             Self::String(s) => write!(f, "{}", s),
             Self::Number(n) => write!(f, "{}", n.to_string()),
+            Self::Nil => write!(f, "nil"),
 
             // Keywords.
             Self::And => write!(f, "and"),

@@ -4,7 +4,7 @@ use crate::token::Token;
 
 pub trait Expr: std::fmt::Display {}
 
-type BoxExpr = Box<dyn Expr>;
+pub type BoxExpr = Box<dyn Expr>;
 
 pub struct Binary {
     pub lhs: BoxExpr,
