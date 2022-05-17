@@ -1,3 +1,4 @@
+use crate::error;
 use crate::expr::{Binary, BoxExpr, Grouping, Literal, Unary};
 use crate::token::{Token, TokenType};
 
@@ -130,19 +131,19 @@ impl Parser {
 
     fn primary(&self) -> BoxExpr {
         if self.match_(&[TokenType::False]) {
-            return Literal::boxed(Token::new(TokenType::False, "false", 1));
+            return Literal::boxed(Token::new(TokenType::False, "false".into(), 1));
         }
 
         if self.match_(&[TokenType::True]) {
-            return Literal::boxed(Token::new(TokenType::True, "true", 1));
+            return Literal::boxed(Token::new(TokenType::True, "true".into(), 1));
         }
 
         if self.match_(&[TokenType::Nil]) {
-            return Literal::boxed(Token::new(TokenType::Nil, "nil", 1));
+            return Literal::boxed(Token::new(TokenType::Nil, "nil".into(), 1));
         }
 
         if self.match_(&[TokenType::Number(1.0)]) {
-            return Literal::boxed(Token::new(TokenType::Number(1.0), "1", 1));
+            return Literal::boxed(Token::new(TokenType::Number(1.0), "1".into(), 1));
         }
 
         if self.match_(&[TokenType::LeftParen]) {
@@ -155,6 +156,10 @@ impl Parser {
     }
 
     fn consume(&self, ty: TokenType, msg: &str) -> Token {
-        if self.
+        if self.check(ty) {
+            return self.advance();
+        }
+
+        error::error(self.peek(), msg);
     }
 }
