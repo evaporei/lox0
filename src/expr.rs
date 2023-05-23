@@ -4,7 +4,7 @@ use crate::token::Token;
 
 pub trait Expr: std::fmt::Display {}
 
-type BoxExpr = Box<dyn Expr>;
+pub type BoxExpr = Box<dyn Expr>;
 
 pub struct Binary {
     pub lhs: BoxExpr,
@@ -17,7 +17,7 @@ impl Binary {
         Self { lhs, op, rhs }
     }
 
-    pub fn boxed(lhs: BoxExpr, op: Token, rhs: BoxExpr) -> Box<Self> {
+    pub fn boxed(lhs: BoxExpr, op: Token, rhs: BoxExpr) -> Box<dyn Expr> {
         Box::new(Self::new(lhs, op, rhs))
     }
 }
