@@ -11,15 +11,15 @@ impl<'a> Parser<'a> {
         Self { tokens, current: 0 }
     }
 
-    fn expression(&self) -> BoxExpr {
+    fn expression(&mut self) -> BoxExpr {
         self.equality()
     }
 
-    fn equality(&self) -> BoxExpr {
+    fn equality(&mut self) -> BoxExpr {
         let mut expr = self.comparison();
 
         while self.match_(&[TokenType::BangEqual, TokenType::EqualEqual]) {
-            let operator = self.previous();
+            let operator = self.previous().unwrap().ty.clone();
             let right = self.comparison();
             expr = Binary::boxed(expr, operator, right);
         }
@@ -27,7 +27,7 @@ impl<'a> Parser<'a> {
         expr
     }
 
-    fn comparison(&self) -> BoxExpr {
+    fn comparison(&mut self) -> BoxExpr {
         let mut expr = self.term();
 
         while self.match_(&[
@@ -36,7 +36,7 @@ impl<'a> Parser<'a> {
             TokenType::Less,
             TokenType::LessEqual,
         ]) {
-            let operator = self.previous();
+            let operator = self.previous().unwrap().ty.clone();
             let right = self.term();
             expr = Binary::boxed(expr, operator, right);
         }
@@ -44,11 +44,11 @@ impl<'a> Parser<'a> {
         expr
     }
 
-    fn term(&self) -> BoxExpr {
+    fn term(&mut self) -> BoxExpr {
         let mut expr = self.unary();
 
         while self.match_(&[TokenType::Minus, TokenType::Plus]) {
-            let operator = self.previous();
+            let operator = self.previous().unwrap().ty.clone();
             let right = self.unary();
             expr = Binary::boxed(expr, operator, right);
         }
@@ -56,11 +56,11 @@ impl<'a> Parser<'a> {
         expr
     }
 
-    fn factor(&self) -> BoxExpr {
+    fn factor(&mut self) -> BoxExpr {
         let mut expr = self.unary();
 
         while self.match_(&[TokenType::Slash, TokenType::Star]) {
-            let operator = self.previous();
+            let operator = self.previous().unwrap().ty.clone();
             let right = self.unary();
             expr = Binary::boxed(expr, operator, right);
         }
@@ -68,9 +68,9 @@ impl<'a> Parser<'a> {
         expr
     }
 
-    fn unary(&self) -> BoxExpr {
+    fn unary(&mut self) -> BoxExpr {
         if self.match_(&[TokenType::Bang, TokenType::Minus]) {
-            let operator = self.previous();
+            let operator = self.previous().unwrap().ty.clone();
             let right = self.unary();
             return Unary::boxed(operator, right);
         }
@@ -78,19 +78,19 @@ impl<'a> Parser<'a> {
         self.primary()
     }
 
-    fn primary(&self) -> BoxExpr {
+    fn primary(&mut self) -> BoxExpr {
         if self.match_(&[TokenType::False]) {
-            return Literal::boxed(false);
+            return Literal::boxed(TokenType::Bool(false));
         }
         if self.match_(&[TokenType::True]) {
-            return Literal::boxed(true);
+            return Literal::boxed(TokenType::Bool(true));
         }
         if self.match_(&[TokenType::Nil]) {
-            return Literal::boxed(todo!("nil?"));
+            return Literal::boxed(TokenType::Nil);
         }
 
-        if self.match_(&[todo!("remove values from variants?")]) {
-            return Literal::boxed(self.previous().map(|t| t.literal));
+        if self.is_literal() {
+            return Literal::boxed(self.previous().map(|t| t.ty.clone()).unwrap());
         }
 
         if self.match_(&[TokenType::LeftParen]) {
@@ -102,7 +102,22 @@ impl<'a> Parser<'a> {
         unreachable!("maybe? or just compiler/parser error")
     }
 
-    fn match_(&self, types: &[TokenType]) -> bool {
+    fn is_literal(&mut self) -> bool {
+        if self.is_at_end() {
+            false
+        } else if self
+            .peek()
+            .map(|token| token.ty.is_literal())
+            .unwrap_or(false)
+        {
+            self.advance();
+            true
+        } else {
+            false
+        }
+    }
+
+    fn match_(&mut self, types: &[TokenType]) -> bool {
         for ty in types {
             if self.check(ty) {
                 self.advance();
@@ -121,7 +136,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn advance(&self) -> Option<&Token> {
+    fn advance(&mut self) -> Option<&Token> {
         if !self.is_at_end() {
             self.current += 1;
         }
@@ -129,7 +144,7 @@ impl<'a> Parser<'a> {
         self.previous()
     }
 
-    fn consume(&self, ty: TokenType, msg: String) -> Option<&Token> {
+    fn consume(&mut self, ty: TokenType, _msg: String) -> Option<&Token> {
         if self.check(&ty) {
             return self.advance();
         }

@@ -27,6 +27,8 @@ pub enum TokenType {
     Identifier(String),
     String(String),
     Number(f64),
+    Bool(bool),
+    Nil,
 
     // Keywords.
     And,
@@ -46,6 +48,12 @@ pub enum TokenType {
     Print,
 
     EOF,
+}
+
+impl TokenType {
+    pub fn is_literal(&self) -> bool {
+        matches!(self, TokenType::String(_) | TokenType::Number(_))
+    }
 }
 
 #[derive(Debug, PartialEq)]

@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::token::Token;
+use crate::token::TokenType;
 
 pub trait Expr: std::fmt::Display {}
 
@@ -8,16 +8,16 @@ pub type BoxExpr = Box<dyn Expr>;
 
 pub struct Binary {
     pub lhs: BoxExpr,
-    pub op: Token,
+    pub op: TokenType,
     pub rhs: BoxExpr,
 }
 
 impl Binary {
-    pub fn new(lhs: BoxExpr, op: Token, rhs: BoxExpr) -> Self {
+    pub fn new(lhs: BoxExpr, op: TokenType, rhs: BoxExpr) -> Self {
         Self { lhs, op, rhs }
     }
 
-    pub fn boxed(lhs: BoxExpr, op: Token, rhs: BoxExpr) -> Box<dyn Expr> {
+    pub fn boxed(lhs: BoxExpr, op: TokenType, rhs: BoxExpr) -> Box<Self> {
         Box::new(Self::new(lhs, op, rhs))
     }
 }
@@ -41,15 +41,15 @@ impl Grouping {
 impl Expr for Grouping {}
 
 pub struct Literal {
-    pub expr: Token,
+    pub expr: TokenType,
 }
 
 impl Literal {
-    pub fn new(expr: Token) -> Self {
+    pub fn new(expr: TokenType) -> Self {
         Self { expr }
     }
 
-    pub fn boxed(expr: Token) -> Box<Self> {
+    pub fn boxed(expr: TokenType) -> Box<Self> {
         Box::new(Self::new(expr))
     }
 }
@@ -57,16 +57,16 @@ impl Literal {
 impl Expr for Literal {}
 
 pub struct Unary {
-    pub op: Token,
+    pub op: TokenType,
     pub rhs: BoxExpr,
 }
 
 impl Unary {
-    pub fn new(op: Token, rhs: BoxExpr) -> Self {
+    pub fn new(op: TokenType, rhs: BoxExpr) -> Self {
         Self { op, rhs }
     }
 
-    pub fn boxed(op: Token, rhs: BoxExpr) -> Box<Self> {
+    pub fn boxed(op: TokenType, rhs: BoxExpr) -> Box<Self> {
         Box::new(Self::new(op, rhs))
     }
 }
