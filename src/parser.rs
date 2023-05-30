@@ -95,7 +95,7 @@ impl<'a> Parser<'a> {
 
         if self.match_(&[TokenType::LeftParen]) {
             let expr = self.expression();
-            self.consume(TokenType::RightParen, "Expect ')' after expression.".into());
+            self.consume(TokenType::RightParen, "Expect ')' after expression.");
             return Grouping::boxed(expr);
         }
 
@@ -144,12 +144,12 @@ impl<'a> Parser<'a> {
         self.previous()
     }
 
-    fn consume(&mut self, ty: TokenType, _msg: String) -> Option<&Token> {
+    fn consume(&mut self, ty: TokenType, msg: &str) -> Option<&Token> {
         if self.check(&ty) {
             return self.advance();
         }
 
-        self.error();
+        self.error(msg);
     }
 
     fn is_at_end(&self) -> bool {
@@ -166,8 +166,8 @@ impl<'a> Parser<'a> {
         self.tokens.get(self.current - 1)
     }
 
-    fn error(&self) -> ! {
-        panic!("parser error")
+    fn error(&self, msg: &str) -> ! {
+        panic!("parser error {msg}")
     }
 }
 
