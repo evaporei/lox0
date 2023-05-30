@@ -90,16 +90,9 @@ impl fmt::Display for Unary {
 #[test]
 fn test_print() {
     let expr = Binary::new(
-        Unary::boxed(
-            Token::new(TokenType::Minus, "-".into(), 1),
-            Literal::boxed(Token::new(TokenType::Number(123.0), "123".into(), 1)),
-        ),
-        Token::new(TokenType::Star, "*".into(), 1),
-        Grouping::boxed(Literal::boxed(Token::new(
-            TokenType::Number(45.67),
-            "45.67".into(),
-            1,
-        ))),
+        Unary::boxed(TokenType::Minus, Literal::boxed(TokenType::Number(123.0))),
+        TokenType::Star,
+        Grouping::boxed(Literal::boxed(TokenType::Number(45.67))),
     );
 
     assert_eq!(expr.to_string(), "(* (- 123) (group 45.67))");
