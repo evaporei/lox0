@@ -1,3 +1,4 @@
+use lox0::parser::Parser;
 use lox0::scanner::Scanner;
 use std::io::{self, Write};
 
