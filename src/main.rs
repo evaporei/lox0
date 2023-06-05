@@ -45,11 +45,13 @@ fn run_prompt() -> io::Result<()> {
 }
 
 fn run(source: &str) {
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
-    println!("{:?}", tokens);
-
-    for token in tokens {
-        println!("{}", token);
-    }
+    let token_types = tokens.into_iter().map(|token| token.ty).collect();
+    let _parser = Parser::new(&token_types);
+    // println!("{:?}", tokens);
+    //
+    // for token in tokens {
+    //     println!("{}", token);
+    // }
 }

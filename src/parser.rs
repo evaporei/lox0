@@ -1,5 +1,6 @@
+#![allow(dead_code)]
 use crate::expr::{Binary, BoxExpr, Grouping, Literal, Unary};
-use crate::token::{Token, TokenType};
+use crate::token::TokenType;
 
 /// Simplified grammar:
 ///
@@ -29,12 +30,12 @@ use crate::token::{Token, TokenType};
 /// literal        → NUMBER | STRING | "true" | "false" | "nil" ;
 ///
 pub struct Parser<'a> {
-    tokens: &'a Vec<Token>,
+    tokens: &'a Vec<TokenType>,
     current: usize,
 }
 
 impl<'a> Parser<'a> {
-    pub fn new(tokens: &'a Vec<Token>) -> Self {
+    pub fn new(tokens: &'a Vec<TokenType>) -> Self {
         Self { tokens, current: 0 }
     }
 
@@ -46,7 +47,7 @@ impl<'a> Parser<'a> {
         let mut expr = self.comparison();
 
         while self.match_(&[TokenType::BangEqual, TokenType::EqualEqual]) {
-            let operator = self.previous().unwrap().ty.clone();
+            let operator = self.previous().unwrap().clone();
             let right = self.comparison();
             expr = Binary::boxed(expr, operator, right);
         }
@@ -63,7 +64,7 @@ impl<'a> Parser<'a> {
             TokenType::Less,
             TokenType::LessEqual,
         ]) {
-            let operator = self.previous().unwrap().ty.clone();
+            let operator = self.previous().unwrap().clone();
             let right = self.term();
             expr = Binary::boxed(expr, operator, right);
         }
@@ -75,7 +76,7 @@ impl<'a> Parser<'a> {
         let mut expr = self.factor();
 
         while self.match_(&[TokenType::Minus, TokenType::Plus]) {
-            let operator = self.previous().unwrap().ty.clone();
+            let operator = self.previous().unwrap().clone();
             let right = self.factor();
             expr = Binary::boxed(expr, operator, right);
         }
@@ -87,7 +88,7 @@ impl<'a> Parser<'a> {
         let mut expr = self.unary();
 
         while self.match_(&[TokenType::Slash, TokenType::Star]) {
-            let operator = self.previous().unwrap().ty.clone();
+            let operator = self.previous().unwrap().clone();
             let right = self.unary();
             expr = Binary::boxed(expr, operator, right);
         }
@@ -97,7 +98,7 @@ impl<'a> Parser<'a> {
 
     fn unary(&mut self) -> BoxExpr {
         if self.match_(&[TokenType::Bang, TokenType::Minus]) {
-            let operator = self.previous().unwrap().ty.clone();
+            let operator = self.previous().unwrap().clone();
             let right = self.unary();
             return Unary::boxed(operator, right);
         }
@@ -116,7 +117,7 @@ impl<'a> Parser<'a> {
             return Literal::boxed(TokenType::Nil);
         }
         if self.is_literal() {
-            return Literal::boxed(self.previous().map(|t| t.ty.clone()).unwrap());
+            return Literal::boxed(self.previous().map(|t| t.clone()).unwrap());
         }
 
         if self.match_(&[TokenType::LeftParen]) {
@@ -132,11 +133,7 @@ impl<'a> Parser<'a> {
     fn is_literal(&mut self) -> bool {
         if self.is_at_end() {
             false
-        } else if self
-            .peek()
-            .map(|token| token.ty.is_literal())
-            .unwrap_or(false)
-        {
+        } else if self.peek().map(|token| token.is_literal()).unwrap_or(false) {
             self.advance();
             true
         } else {
@@ -159,11 +156,11 @@ impl<'a> Parser<'a> {
         if self.is_at_end() {
             false
         } else {
-            self.peek().map(|token| token.ty == *ty).unwrap_or(false)
+            self.peek().map(|token| token == ty).unwrap_or(false)
         }
     }
 
-    fn advance(&mut self) -> Option<&Token> {
+    fn advance(&mut self) -> Option<&TokenType> {
         if !self.is_at_end() {
             self.current += 1;
         }
@@ -171,7 +168,7 @@ impl<'a> Parser<'a> {
         self.previous()
     }
 
-    fn consume(&mut self, ty: TokenType, msg: &str) -> Option<&Token> {
+    fn consume(&mut self, ty: TokenType, msg: &str) -> Option<&TokenType> {
         if self.check(&ty) {
             return self.advance();
         }
@@ -181,19 +178,19 @@ impl<'a> Parser<'a> {
 
     fn is_at_end(&self) -> bool {
         self.peek()
-            .map(|token| token.ty == TokenType::EOF)
+            .map(|token| *token == TokenType::EOF)
             .unwrap_or(false)
     }
 
-    fn peek(&self) -> Option<&Token> {
+    fn peek(&self) -> Option<&TokenType> {
         self.tokens.get(self.current)
     }
 
-    fn previous(&self) -> Option<&Token> {
+    fn previous(&self) -> Option<&TokenType> {
         self.tokens.get(self.current - 1)
     }
 
-    fn error(&self, at_token: Option<&Token>, msg: &str) -> ! {
+    fn error(&self, at_token: Option<&TokenType>, msg: &str) -> ! {
         panic!("parser error at {at_token:?} {msg}")
     }
 }
@@ -209,10 +206,11 @@ mod tests {
     #[test]
     fn test_parse_expr() {
         let source_code = "1 - (2 * 3) < 4 == false";
-        let mut scanner = Scanner::new(source_code);
+        let scanner = Scanner::new(source_code);
         let tokens = scanner.scan_tokens();
+        let token_types = tokens.into_iter().map(|token| token.ty).collect();
 
-        let mut parser = Parser::new(tokens);
+        let mut parser = Parser::new(&token_types);
         let expr = parser.expression();
         assert_eq!(expr.to_string(), "(== (< (- 1 (group (* 2 3))) 4) false)");
     }

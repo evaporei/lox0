@@ -39,7 +39,7 @@ impl<'a> Scanner<'a> {
         }
     }
 
-    pub fn scan_tokens(&mut self) -> &Vec<Token> {
+    pub fn scan_tokens(mut self) -> Vec<Token> {
         while !self.is_at_end() {
             self.start = self.current;
             self.scan_token();
@@ -48,7 +48,7 @@ impl<'a> Scanner<'a> {
         self.tokens
             .push(Token::new(TokenType::EOF, "".into(), self.line));
 
-        &self.tokens
+        self.tokens
     }
 
     fn scan_token(&mut self) {
@@ -238,11 +238,11 @@ impl<'a> Scanner<'a> {
 #[test]
 fn test_print() {
     let source = "print \"Hello, world!\";";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::Print, "print".into(), 1),
             Token::new(
                 TokenType::String("Hello, world!".into()),
@@ -261,11 +261,11 @@ fn test_boolean() {
     true;  // Not false.
     false; // Not *not* false.
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::True, "true".into(), 2),
             Token::new(TokenType::Semicolon, ";".into(), 2),
             Token::new(TokenType::False, "false".into(), 3),
@@ -281,11 +281,11 @@ fn test_numbers() {
     1234;  // An integer.
     12.34; // A decimal number.
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::Number(1234.0), "1234".into(), 2),
             Token::new(TokenType::Semicolon, ";".into(), 2),
             Token::new(TokenType::Number(12.34), "12.34".into(), 3),
@@ -302,11 +302,11 @@ fn test_strings() {
     \"\";    // The empty string.
     \"123\"; // This is a string, not a number.
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(
                 TokenType::String("I am a string".into()),
                 "\"I am a string\"".into(),
@@ -330,11 +330,11 @@ fn test_arithmetic() {
     multiply * me;
     divide / me;
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::Identifier("add".into()), "add".into(), 2),
             Token::new(TokenType::Plus, "+".into(), 2),
             Token::new(TokenType::Identifier("me".into()), "me".into(), 2),
@@ -369,11 +369,11 @@ fn test_negate() {
     let source = "
     -negateMe;
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::Minus, "-".into(), 2),
             Token::new(
                 TokenType::Identifier("negateMe".into()),
@@ -394,11 +394,11 @@ fn test_comparison() {
     greater > than;
     greaterThan >= orEqual;
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::Identifier("less".into()), "less".into(), 2),
             Token::new(TokenType::Less, "<".into(), 2),
             Token::new(TokenType::Identifier("than".into()), "than".into(), 2),
@@ -438,11 +438,11 @@ fn test_equality() {
     314 == \"pi\"; // false.
     123 == \"123\"; // false.
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::Number(1.0), "1".into(), 2),
             Token::new(TokenType::EqualEqual, "==".into(), 2),
             Token::new(TokenType::Number(2.0), "2".into(), 2),
@@ -476,11 +476,11 @@ fn test_logical_operators() {
     false or false; // false.
     true or false;  // true.
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::Bang, "!".into(), 2),
             Token::new(TokenType::True, "true".into(), 2),
             Token::new(TokenType::Semicolon, ";".into(), 2),
@@ -513,11 +513,11 @@ fn test_precedence_and_grouping() {
     let source = "
     var average = (min + max) / 2;
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::Var, "var".into(), 2),
             Token::new(TokenType::Identifier("average".into()), "average".into(), 2),
             Token::new(TokenType::Equal, "=".into(), 2),
@@ -541,11 +541,11 @@ fn test_block() {
       print \"One statement.\";
       print \"Two statements.\";
     }";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::LeftBrace, "{".into(), 2),
             Token::new(TokenType::Print, "print".into(), 3),
             Token::new(
@@ -578,11 +578,11 @@ fn test_variables() {
     breakfast = \"beignets\";
     print breakfast; // \"beignets\".
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::Var, "var".into(), 2),
             Token::new(
                 TokenType::Identifier("imAVariable".into()),
@@ -648,11 +648,11 @@ fn test_if_else() {
       print \"no\";
     }
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::If, "if".into(), 2),
             Token::new(TokenType::LeftParen, "(".into(), 2),
             Token::new(
@@ -686,11 +686,11 @@ fn test_while() {
       a = a + 1;
     }
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::Var, "var".into(), 2),
             Token::new(TokenType::Identifier("a".into()), "a".into(), 2),
             Token::new(TokenType::Equal, "=".into(), 2),
@@ -725,11 +725,11 @@ fn test_for() {
         print a;
     }
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::For, "for".into(), 2),
             Token::new(TokenType::LeftParen, "(".into(), 2),
             Token::new(TokenType::Var, "var".into(), 2),
@@ -771,11 +771,11 @@ fn test_functions() {
     fun returnSum(a, b) {
       return a + b;
     }";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(
                 TokenType::Identifier("makeBreakfast".into()),
                 "makeBreakfast".into(),
@@ -872,11 +872,11 @@ fn test_closures() {
     var fn = returnFunction();
     fn();
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::Fun, "fun".into(), 2),
             Token::new(TokenType::Identifier("addPair".into()), "addPair".into(), 2),
             Token::new(TokenType::LeftParen, "(".into(), 2),
@@ -1066,11 +1066,11 @@ fn test_class() {
     // \"Enjoy your bacon and toast, Dear Reader.\"
     ";
 
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::Class, "class".into(), 2),
             Token::new(
                 TokenType::Identifier("Breakfast".into()),
@@ -1306,11 +1306,11 @@ fn test_inheritance() {
       }
     }
     ";
-    let mut scanner = Scanner::new(source);
+    let scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
     assert_eq!(
         tokens,
-        &vec![
+        vec![
             Token::new(TokenType::Class, "class".into(), 2),
             Token::new(TokenType::Identifier("Brunch".into()), "Brunch".into(), 2),
             Token::new(TokenType::Less, "<".into(), 2),
