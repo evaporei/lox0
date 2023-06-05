@@ -123,7 +123,6 @@ impl<'a> Parser<'a> {
         if self.match_(&[TokenType::Nil]) {
             return Literal::boxed(TokenType::Nil);
         }
-
         if self.is_literal() {
             return Literal::boxed(self.previous().map(|t| t.ty.clone()).unwrap());
         }
@@ -137,6 +136,7 @@ impl<'a> Parser<'a> {
         unreachable!("maybe? or just compiler/parser error")
     }
 
+    // match_ for enum variants with values inside (eg: String and Number)
     fn is_literal(&mut self) -> bool {
         if self.is_at_end() {
             false
@@ -184,7 +184,7 @@ impl<'a> Parser<'a> {
             return self.advance();
         }
 
-        self.error(msg);
+        self.error(self.peek(), msg);
     }
 
     fn is_at_end(&self) -> bool {
@@ -201,8 +201,8 @@ impl<'a> Parser<'a> {
         self.tokens.get(self.current - 1)
     }
 
-    fn error(&self, msg: &str) -> ! {
-        panic!("parser error {msg}")
+    fn error(&self, at_token: Option<&Token>, msg: &str) -> ! {
+        panic!("parser error at {at_token:?} {msg}")
     }
 }
 
