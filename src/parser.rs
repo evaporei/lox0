@@ -1,6 +1,41 @@
 use crate::expr::{Binary, BoxExpr, Grouping, Literal, Unary};
 use crate::token::{Token, TokenType};
 
+/// Simplified grammar:
+///
+/// expression     → literal
+///                | unary
+///                | binary
+///                | grouping ;
+///
+/// literal        → NUMBER | STRING | "true" | "false" | "nil" ;
+/// grouping       → "(" expression ")" ;
+/// unary          → ( "-" | "!" ) expression ;
+/// binary         → expression operator expression ;
+/// operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
+///                | "+"  | "-"  | "*" | "/" ;
+///
+/// "Strict"/complete grammar:
+///
+/// expression     → equality ;
+/// equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+/// comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+/// term           → factor ( ( "-" | "+" ) factor )* ;
+/// factor         → unary ( ( "/" | "*" ) unary )* ;
+/// unary          → ( "!" | "-" ) unary
+///                | primary ;
+/// primary        → "(" expression ")"
+///                | literal ;
+/// literal        → NUMBER | STRING | "true" | "false" | "nil" ;
+///
+///
+/// expression     → unary ;
+/// unary          → ( "!" | "-" ) unary
+///                | primary ;
+/// primary        → "(" expression ")"
+///                | literal ;
+/// literal        → NUMBER | STRING | "true" | "false" | "nil" ;
+///
 pub struct Parser<'a> {
     tokens: &'a Vec<Token>,
     current: usize,
