@@ -80,11 +80,11 @@ impl<'a> Parser<'a> {
     }
 
     fn term(&mut self) -> BoxExpr {
-        let mut expr = self.unary();
+        let mut expr = self.factor();
 
         while self.match_(&[TokenType::Minus, TokenType::Plus]) {
             let operator = self.previous().unwrap().ty.clone();
-            let right = self.unary();
+            let right = self.factor();
             expr = Binary::boxed(expr, operator, right);
         }
 
