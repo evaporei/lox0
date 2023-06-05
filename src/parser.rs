@@ -208,3 +208,20 @@ impl<'a> Parser<'a> {
 
 #[allow(unused)]
 struct ParseError;
+
+#[cfg(test)]
+mod tests {
+    use crate::parser::Parser;
+    use crate::scanner::Scanner;
+
+    #[test]
+    fn test_parse_expr() {
+        let source_code = "1 - (2 * 3) < 4 == false";
+        let mut scanner = Scanner::new(source_code);
+        let tokens = scanner.scan_tokens();
+
+        let mut parser = Parser::new(tokens);
+        let expr = parser.expression();
+        assert_eq!(expr.to_string(), "(== (< (- 1 (group (* 2 3))) 4) false)");
+    }
+}
