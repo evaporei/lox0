@@ -28,14 +28,6 @@ use crate::token::{Token, TokenType};
 ///                | literal ;
 /// literal        → NUMBER | STRING | "true" | "false" | "nil" ;
 ///
-///
-/// expression     → unary ;
-/// unary          → ( "!" | "-" ) unary
-///                | primary ;
-/// primary        → "(" expression ")"
-///                | literal ;
-/// literal        → NUMBER | STRING | "true" | "false" | "nil" ;
-///
 pub struct Parser<'a> {
     tokens: &'a Vec<Token>,
     current: usize,
