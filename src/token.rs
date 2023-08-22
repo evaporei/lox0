@@ -54,6 +54,25 @@ impl TokenType {
     pub fn is_literal(&self) -> bool {
         matches!(self, TokenType::String(_) | TokenType::Number(_))
     }
+
+    pub fn is_truthy(&self) -> bool {
+        match self {
+            Self::Bool(b) => *b,
+            Self::Nil => false,
+            _ => true,
+        }
+    }
+
+    pub fn is_equal(&self, other: &Self) -> bool {
+        match (self, other) {
+            (TokenType::Nil, TokenType::Nil) => true,
+            (TokenType::Nil, _) => false,
+            (TokenType::String(s), TokenType::String(u)) => s == u,
+            (TokenType::Number(l), TokenType::Number(r)) => l == r,
+            (TokenType::Bool(l), TokenType::Bool(r)) => l == r,
+            _ => false,
+        }
+    }
 }
 
 #[derive(Debug, PartialEq)]

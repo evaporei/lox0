@@ -39,7 +39,7 @@ impl<'a> Parser<'a> {
         Self { tokens, current: 0 }
     }
 
-    fn expression(&mut self) -> BoxExpr {
+    pub fn expression(&mut self) -> BoxExpr {
         self.equality()
     }
 
