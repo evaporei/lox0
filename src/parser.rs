@@ -129,6 +129,30 @@ impl<'a> Parser<'a> {
         unreachable!("maybe? or just compiler/parser error")
     }
 
+    fn synchronize(&mut self) {
+        self.advance();
+
+        while !self.is_at_end() {
+            if self.previous() == Some(&TokenType::Semicolon) {
+                return;
+            }
+
+            match self.peek() {
+                Some(&TokenType::Class)
+                | Some(&TokenType::Fun)
+                | Some(&TokenType::Var)
+                | Some(&TokenType::For)
+                | Some(&TokenType::If)
+                | Some(&TokenType::While)
+                | Some(&TokenType::Print)
+                | Some(&TokenType::Return) => return,
+                _ => {}
+            }
+
+            self.advance();
+        }
+    }
+
     // match_ for enum variants with values inside (eg: String and Number)
     fn is_literal(&mut self) -> bool {
         if self.is_at_end() {
